@@ -7,18 +7,17 @@
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, BlinkMacSystemFont, sans-serif; }
-body { overflow-x:hidden; color:white; height:100vh; background:#000; }
+body { overflow-x:hidden; color:white; height:100vh; background:#000; cursor:grab; }
 
-header, footer { text-align:center; padding:20px; background:#000; position:relative; z-index:10; }
+header, footer { text-align:center; padding:20px; position:relative; z-index:10; }
 header a, footer a { color:#aaa; text-decoration:none; margin:0 10px; transition:0.3s; }
 header a:hover, footer a:hover { color:white; }
 
-.hero { text-align:center; padding:80px 20px; z-index:10; position:relative; }
+.hero { text-align:center; padding:80px 20px; position:relative; z-index:10; }
 .hero h1 { font-size:60px; background:linear-gradient(90deg,#00f0ff,#ff00ff); -webkit-background-clip:text; color:transparent; }
 
-.slider { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:80vh; position:relative; z-index:10; }
-
-.block { min-width:100vw; height:80vh; scroll-snap-align:start; display:flex; justify-content:center; align-items:center; position:relative; }
+.slider { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:80vh; position:relative; z-index:10; perspective:1000px; }
+.block { min-width:100vw; height:80vh; scroll-snap-align:start; display:flex; justify-content:center; align-items:center; position:relative; transition:transform 0.5s ease; }
 .block-content { text-align:center; max-width:600px; z-index:10; }
 .block h2 { font-size:40px; margin-bottom:20px; }
 .block p { opacity:0.7; transition:0.5s; }
@@ -119,12 +118,12 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let particles = [];
-for(let i=0;i<50;i++){
+for(let i=0;i<70;i++){
   particles.push({
     x:Math.random()*canvas.width,
     y:Math.random()*canvas.height,
-    vx:Math.random()*1.5-0.75,
-    vy:Math.random()*1.5-0.75,
+    vx:Math.random()*1.2-0.6,
+    vy:Math.random()*1.2-0.6,
     r: Math.random()*3+1
   });
 }
@@ -147,7 +146,23 @@ function animate(){
 }
 animate();
 
-// 🔹 Подстройка под ресайз окна
+// 🔹 Parallax блока при свайпе/скролле
+const blocks = document.querySelectorAll('.block');
+window.addEventListener('scroll', () => {
+  blocks.forEach(b => {
+    let rect = b.getBoundingClientRect();
+    let offset = rect.top / window.innerHeight;
+    b.style.transform = `translateY(${offset * -50}px)`;
+  });
+});
+
+// 🔹 Реакция фона на движение мыши/тач
+document.addEventListener('mousemove', e => {
+  let x = (e.clientX / window.innerWidth - 0.5) * 50;
+  let y = (e.clientY / window.innerHeight - 0.5) * 50;
+  canvas.style.transform = `translate(${x}px, ${y}px)`;
+});
+
 window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
